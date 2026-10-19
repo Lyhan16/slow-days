@@ -1,46 +1,36 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="description" content="按下快门，让回忆慢慢显影。一份关于六周年的小礼物。">
-  <title>慢慢显影 · 六周年</title>
-  <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="style.css">
-  <script src="assets/feel.js" defer></script>
-  <script src="memories.js" defer></script>
-  <script src="app.js" defer></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#ffffff"><meta name="description" content="按下快门，让回忆慢慢显影。一份关于六周年的小礼物。"><title>慢慢显影 · 六周年</title><link rel="icon" href="data:,"><link rel="preload" as="image" href="assets/camera.webp"><link rel="stylesheet" href="style.css">
+<script src="assets/feel.js" defer></script><script src="memories.js" defer></script><script src="geometry.js" defer></script><script src="clothesline.js" defer></script><script src="app.js" defer></script>
 </head>
 <body>
-  <main id="experience" data-state="idle">
-    <header id="heading" hidden><span class="eyebrow">FOR QIUQIU · YEAR SIX</span><p>慢慢显影</p></header>
-    <div id="camera-scene" class="camera-scene">
-      <div class="ground-shadow" aria-hidden="true"></div>
-      <div id="eject-window" class="eject-window" aria-hidden="true"><div id="eject-paper" class="eject-paper"><div class="undeveloped"></div></div></div>
-      <button id="camera" class="camera" aria-label="按下快门，拍出第一张照片" title="按下快门">
-        <img id="camera-image" src="assets/camera.png" alt="白色 Mini 7 拍立得，透明保护壳和奶牛纹背带" draggable="false" fetchpriority="high">
-        <span class="shutter-indicator" aria-hidden="true"></span>
-        <span class="camera-tooltip">按下快门</span>
-      </button>
-      <div id="flash" class="flash" aria-hidden="true"></div>
-    </div>
-    <div id="viewer" class="viewer" hidden role="dialog" aria-modal="true" aria-label="查看拍立得照片" tabindex="-1">
-      <button id="photo" class="photo" aria-label="翻到照片背面" aria-pressed="false">
-        <span id="photo-turn" class="photo-turn">
-          <span class="photo-face photo-front"><span class="image-well"><img id="photo-image" src="data:," alt=""><span id="developer" class="developer"></span><span class="film-grain" aria-hidden="true"></span></span><span class="photo-caption"><span id="photo-title"></span><span id="photo-number"></span></span></span>
-          <span class="photo-face photo-back" aria-hidden="true"><span class="back-top"><span>TO · 球球</span><span id="back-number"></span></span><span class="back-writing"><span id="back-title"></span><span id="back-text"></span></span><span class="back-bottom"><span>示例文字 · 待换成我们的回忆</span><span class="tiny-heart">♡</span></span></span>
-        </span>
-      </button>
-      <div id="photo-actions" class="photo-actions" hidden><span class="small-note" id="flip-hint">点一下照片，看看背面</span><div class="action-row"><button id="previous" class="text-button" aria-label="查看上一张" hidden>← 上一张</button><button id="flip" class="text-button">翻到背面</button><button id="collect" class="primary-button">收好这张 <span aria-hidden="true">↗</span></button><button id="next" class="text-button" aria-label="查看下一张" hidden>下一张 →</button></div></div>
-    </div>
-    <button id="pile" class="pile" hidden aria-label="打开已收好的照片"><span id="pile-cards" class="pile-cards" aria-hidden="true"></span><span class="pile-label">收好的回忆 <span id="pile-count">01 / 21</span></span></button>
-    <p id="status" class="status" role="status" aria-live="polite"></p>
-    <footer id="footer" hidden><span class="demo-label">演示相纸 · 21 张</span><div><button id="sound" aria-pressed="false">声音 · 关</button><button id="restart">重新开始</button></div></footer>
-    <section id="ending" class="ending" hidden><span class="eyebrow">21 / 21</span><h1>这一盒，慢慢拍完了。</h1><p>下一张，留给我们以后的日子。</p><button id="ending-album" class="text-button">再看一遍这些回忆 ↗</button></section>
-    <section id="album" class="album" hidden role="dialog" aria-modal="true" aria-labelledby="album-title" tabindex="-1"><div class="album-top"><div><span class="eyebrow">A LITTLE BOX OF MEMORIES</span><h1 id="album-title">收好的回忆</h1><p id="album-summary"></p></div><button id="close-album" class="close-button">回到相机 <span aria-hidden="true">×</span></button></div><div id="album-grid" class="album-grid"></div><p class="album-foot">这些风景暂时代替我们的照片。真正的故事，等你来写。</p></section>
-    <dialog id="reset-dialog"><form method="dialog"><p class="eyebrow">从第一张开始</p><h2>再拍一遍这盒相纸？</h2><p>收好的演示照片会放回相机里。</p><div class="action-row"><button value="cancel" class="text-button">先留着</button><button value="reset" class="primary-button">重新开始</button></div></form></dialog>
-    <noscript>请启用浏览器的 JavaScript，体验拍立得出片与翻面。</noscript>
-  </main>
-</body>
-</html>
+<main id="experience" data-state="idle">
+<header id="heading" class="masthead"><div class="wordmark">慢慢显影<span>给球球的第六年</span></div><button id="pile" class="collection-button" hidden aria-label="查看全部已经显影的照片">已经显影 <span id="pile-count">0 / 21</span><span aria-hidden="true">↗</span></button></header>
+<section id="clothesline" class="clothesline" aria-label="晾在绳上的拍立得照片">
+<div id="line-viewport" class="line-viewport" tabindex="0" aria-label="照片晾绳，可以左右滚动"><div id="line-track" class="line-track"><svg id="rope" class="rope" aria-hidden="true" preserveAspectRatio="none"><path class="rope-shadow"/><path class="rope-core"/><path class="rope-highlight"/></svg><div id="hanging-photos"></div></div></div>
+<div id="line-empty" class="line-empty"><span class="wood-clip empty-clip" aria-hidden="true"><i></i></span><p>留个位置，给下一张回忆。</p></div>
+<div id="line-navigation" class="line-navigation" hidden><button id="line-previous" aria-label="向左查看晾绳上的照片">←</button><span id="line-range"></span><button id="line-next" aria-label="向右查看晾绳上的照片">→</button></div>
+</section>
+<section id="workbench" class="workbench" aria-labelledby="intro-title">
+<div id="intro" class="intro"><p class="anniversary-note">写给球球</p><h1 id="intro-title">把日子，<br>慢慢挂起来。</h1><p class="intro-copy">那二十张舍不得用完的相纸，<br>这次，想陪你再看一遍。</p><button id="shoot" class="primary-button shutter-action">按下快门 <span aria-hidden="true">↗</span></button></div>
+<div class="camera-bay"><div id="camera-scene" class="camera-scene"><div class="ground-shadow" aria-hidden="true"></div><div class="contact-shadow" aria-hidden="true"></div><div id="camera-shell" class="camera-shell">
+<button id="camera" class="camera" aria-label="按下快门，拍出第一张照片" title="按下快门"><img id="camera-image" src="assets/camera.webp" width="1316" height="1195" alt="白色 Mini 7 拍立得，透明保护壳和奶牛纹背带" draggable="false" fetchpriority="high"></button>
+<div id="eject-window" class="eject-window" aria-hidden="true"><div id="eject-plane" class="eject-plane"><div id="eject-paper" class="eject-paper"><div class="undeveloped"></div><span class="eject-mark"></span></div></div></div>
+<img id="camera-foreground" class="camera-foreground" src="assets/camera.webp" width="1316" height="1195" alt="" aria-hidden="true" draggable="false"><div id="flash" class="flash" aria-hidden="true"></div>
+</div></div><p id="status" class="status" role="status" aria-live="polite"></p></div>
+<div id="ending" class="ending" hidden><p class="anniversary-note">这一盒，慢慢拍完了。</p><h2>下一张，<br>留给以后的日子。</h2><p>已经挂起的回忆，还可以一张张翻看。</p><button id="ending-album" class="text-button">查看全部照片 ↗</button></div>
+</section>
+<footer id="footer"><span class="demo-label">21 张演示相纸，等着换成我们的照片。</span><div><button id="sound" aria-pressed="false">声音关</button><button id="restart">重新开始</button></div></footer>
+<div id="viewer" class="viewer" hidden role="dialog" aria-modal="true" aria-label="查看拍立得照片" tabindex="-1">
+<button id="photo" class="photo" aria-label="翻到照片背面" aria-pressed="false"><span id="photo-turn" class="photo-turn">
+<span class="photo-face photo-front"><span class="image-well"><img id="photo-image" src="data:," alt=""><span id="developer" class="developer"></span></span><span class="photo-caption"><span id="photo-title"></span><span id="photo-number"></span></span></span>
+<span class="photo-face photo-back" aria-hidden="true"><span class="back-top"><span>写给球球</span><span id="back-number"></span></span><span class="back-writing"><span id="back-title"></span><span id="back-text"></span></span><span class="back-bottom"><span>演示文字，之后写下我们的回忆</span><span class="tiny-heart" aria-hidden="true">♡</span></span></span>
+</span></button>
+<div id="photo-actions" class="photo-actions" hidden><span id="flip-hint" class="small-note">点一下照片，看看背面。</span><div class="action-row"><button id="previous" class="text-button" aria-label="查看上一张">← 上一张</button><button id="flip" class="text-button">翻到背面</button><button id="collect" class="primary-button">挂回晾绳 <span aria-hidden="true">↗</span></button><button id="next" class="text-button" aria-label="查看下一张">下一张 →</button></div></div>
+</div>
+<section id="album" class="album" hidden role="dialog" aria-modal="true" aria-labelledby="album-title" tabindex="-1"><div class="album-top"><div><h2 id="album-title">已经显影的日子</h2><p id="album-summary"></p></div><button id="close-album" class="close-button">回到相机 <span aria-hidden="true">×</span></button></div><div id="album-grid" class="album-grid"></div><p class="album-foot">点开一张照片，背面还留着写给你的话。</p></section>
+<dialog id="reset-dialog"><form method="dialog"><h2>再拍一遍这盒相纸？</h2><p>晾绳上的演示照片会放回相机里。</p><div class="action-row"><button value="cancel" class="text-button">先留着</button><button value="reset" class="primary-button">重新开始</button></div></form></dialog>
+<noscript>请启用浏览器的 JavaScript，体验拍立得出片与翻面。</noscript>
+</main></body></html>
+
