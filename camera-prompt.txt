@@ -1,0 +1,6 @@
+Built-in ImageGen; product-mockup. User-supplied reference image used for the camera, clear shell and cow-print strap. Transparent output requested and preserved.
+
+Create a premium photorealistic cutout of a Fujifilm instax mini 7 / 7s-style creamy white camera, pale lavender shutter button on upper left front, dark viewfinder, vertical flash at upper center and extended round lens to the right. Keep a realistic clear protective hard shell and thick black-and-white cow-print strap looping around the sides and below the body. Almost orthographic front view, very slightly elevated to show the top ejection slot. Entire object within frame. Soft neutral studio light; detailed shell highlights and fabric. True transparent alpha. No floor, reflection, cast ground shadow, emerging film, additional objects or text outside the camera. Keep top edge horizontal for the separate animated paper layer.
+
+Original generated asset: C:\Users\San\.codex\generated_images\01a153f1-b358-7533-a796-a72784c4b3ed\exec-54aabce3-8971-4eab-b562-24a9eb3e7eb3.png
+Site asset: dist/assets/camera.png

@@ -1,0 +1,7 @@
+{
+  "name": "slowly-developing-six-years",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A quiet, photographic anniversary keepsake.",
+  "scripts": {"start": "node serve.cjs", "check": "node --check dist/app.js"}
+}
