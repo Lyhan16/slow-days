@@ -20,13 +20,22 @@ async function scenario(reduced,initialSave=null,brokenImage=false){
   const html=fs.readFileSync(path.join(dist,'index.html'),'utf8');for(const tag of html.matchAll(/<[^>]+\bid="([^"]+)"[^>]*>/g)){const el=get(tag[1]);el.hidden=/\bhidden\b/.test(tag[0]);}
   const doc={getElementById:get,querySelector:s=>get(s),createElement:()=>new El(),addEventListener(){},get activeElement(){return active;}};
   class Img extends El{async decode(){if(brokenImage)throw Error('Missing test image');}}
-  const sandbox={console,document:doc,Image:Img,innerWidth:390,innerHeight:844,queueMicrotask,performance,matchMedia:()=>({matches:reduced,addEventListener(){}}),requestAnimationFrame:fn=>{raf.push(fn);return raf.length;},cancelAnimationFrame(){},localStorage:{getItem(){return saved;},setItem(k,v){saved=v;}},addEventListener(){}};
+  const settings=new Map();
+  get('camera-scene').parentElement=new El('camera-bay');
+  const sandbox={console,document:doc,Image:Img,innerWidth:390,innerHeight:844,queueMicrotask,performance,matchMedia:()=>({matches:reduced,addEventListener(){}}),requestAnimationFrame:fn=>{raf.push(fn);return raf.length;},cancelAnimationFrame(){},localStorage:{getItem(k){return k==='six-years-demo-v1'?saved:settings.get(k)??null;},setItem(k,v){if(k==='six-years-demo-v1')saved=v;else settings.set(k,v);}},addEventListener(){}};
   sandbox.window=sandbox;const context=vm.createContext(sandbox);
   for(const file of ['assets/feel.js','memories.js','geometry.js','clothesline.js','app.js'])vm.runInContext(fs.readFileSync(path.join(dist,file),'utf8'),context,{filename:file});
   async function drain(){for(let i=0;i<20;i++){await Promise.resolve();const frames=raf.splice(0);frames.forEach(fn=>fn((i+1)*16.7));await Promise.resolve();}}
   const mode=()=>get('experience').dataset.state;
   const click=async id=>{assert.equal(get(id).disabled,false,id+' enabled');await get(id).fire('click');await drain();};
   assert.equal(mode(),'idle');
+  const baseFeed=new sandbox.Feel.Body({mass:1,freq:.48,zeta:1,restX:.008,restV:.015});
+  const slowFeed=new sandbox.Feel.Body({mass:1,freq:.48*.7,zeta:1,restX:.008,restV:.015*.7});
+  assert.ok(Math.abs(slowFeed.measureStep(0,1).settle/baseFeed.measureStep(0,1).settle-1/.7)<.02,'default feed runs at 70 percent of original speed');
+  assert.equal(get('print-speed').value,'0.7');
+  get('print-speed').value='0.4';await get('print-speed').fire('input');assert.equal(get('speed-value').textContent,'0.40×');assert.equal(settings.get('six-years-print-speed'),'0.4');
+  get('print-speed').value='1.4';await get('print-speed').fire('input');assert.equal(get('print-speed').attrs['aria-valuetext'],'1.40 倍');
+  get('print-speed').value='0.7';await get('print-speed').fire('input');
   const starting=JSON.parse(saved||'null')?.count||0;
   if(brokenImage){await click('camera');assert.equal(mode(),'idle');assert.match(get('status').textContent,/再试/);return{imageFailureRetry:true};}
   for(let n=starting+1;n<=21;n++){

@@ -10,7 +10,9 @@ VISUAL_DENSITY: 2. One headline, short copy and one shutter action. Collection t
 
 Foundation: retained buildless HTML/CSS and Feel runtime. White-only intentionally follows the user's explicit white-background requirement. Graphite type, actual lavender shutter accent, square film, pill controls and requested wooden pegs.
 
-The generated camera remains unchanged. Its rear, emerging paper and foreground lip are separate DOM layers; calibrated coordinates live in geometry.js. The same square object-fit coordinate system drives every layer.
+The camera's lower strap has been edited to sit in the foreground on the same ground plane, with contact shadows under the body and strap separately. Its upper body and slot retain the calibrated geometry and canvas dimensions. Rear, emerging paper and foreground lip are separate DOM layers; calibrated coordinates live in geometry.js. The same square object-fit coordinate system drives every layer.
+
+Follow-up revision: removed the complete masthead, raised the composition, moved album access into the footer. During printing the workbench moves above the clothesline in the stacking order. A physical zoom brings the camera to bottom center with its lower body cropped. The full paper fits within the viewport: slot at 66% viewport height, width constrained by both viewport width and the paper's 54:86 ratio. The slider defaults to .70 speed, maps to .48 * speed Hz with critical damping and proportional velocity tolerance, and retargets the same body without restarting. Speed and photograph count use separate storage keys.
 
 Reference: https://github.com/alejandrobujan/tendedero and its PeggedView.swift / LineView.swift. Borrow the hanging pivot and responsive swing idea, not the glass framing, metal clips, Mac UI or source implementation. Preserve 54:86 film and 46:62 image proportions.
 

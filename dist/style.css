@@ -27,3 +27,22 @@ body:has(.viewer:not([hidden])){overflow:hidden}#experience[data-state="printing
 .line-empty{color:#756b5f}.image-well img{filter:saturate(.9)}
 @media(max-width:767px){#experience[data-state="printing"] .intro{opacity:0}}
 .eject-window{perspective-origin:50% 100%}
+/* The header is intentionally empty. New paper owns the foreground while printing. */
+.clothesline{margin-top:12px}
+.workbench{margin-top:clamp(8px,1.5dvh,18px)}
+.camera-scene{transform-origin:50% 50%}
+.ground-shadow{left:13%;width:77%;bottom:20.5%;height:7%;background:rgba(57,48,50,.23);filter:blur(10px)}
+.contact-shadow{left:19%;width:62%;bottom:23%;height:2.6%;background:rgba(48,42,44,.4);filter:blur(3px)}
+.camera-scene:after{content:"";position:absolute;z-index:0;pointer-events:none;left:32%;width:62%;bottom:7.8%;height:1.8%;border-radius:50%;background:#4b40424a;filter:blur(3px)}
+#experience[data-state="printing"] .workbench{z-index:6}
+#experience[data-state="printing"] .intro{opacity:0;pointer-events:none}
+#experience[data-state="printing"] .status{visibility:hidden}
+#experience[data-state="printing"] .ground-shadow,#experience[data-state="printing"] .contact-shadow{opacity:0}
+#experience[data-state="printing"] .camera-scene:after{opacity:0}
+footer{position:relative;z-index:8;background:#fff;flex-wrap:wrap}
+.speed-control{display:flex;flex-direction:column;gap:7px;min-width:168px;color:#706875;font-size:10px;letter-spacing:.5px;padding:8px 0}
+.speed-control>span:first-child{display:flex;justify-content:space-between;gap:14px}
+.speed-control output{font:10px Consolas,monospace;color:#665272}
+.speed-track{display:flex;align-items:center;gap:9px;font-size:9px;color:#8a808d}
+.speed-track input{width:122px;height:16px;margin:0;accent-color:#9d87ad;cursor:pointer}
+@media(max-width:767px){.clothesline{margin-top:9px}.camera-scene{left:50%}.workbench{margin-top:0;padding-top:6px}.speed-control{min-width:145px}.speed-track input{width:100px}footer .demo-label{display:none}footer>div{gap:13px}footer{padding-top:5px;align-items:center}}

@@ -1,4 +1,5 @@
-/* Photographic workbench. Feed uses a slow, critically damped .48 Hz model;
+/* Photographic workbench. Feed uses a critically damped .48 Hz base model,
+   multiplied by the speed control (default .70, or 30% less speed).
    paper flight is light/gentle, camera is gentle, flip is smooth. Browser
    keyframes are baked from exact physical trajectories by Feel.handoff.
    Their lengths are computed from settling, not arbitrary animation times. */
@@ -8,7 +9,9 @@ const $=id=>document.getElementById(id),memories=window.MEMORIES,total=memories.
 const root=$('experience'),camera=$('camera'),scene=$('camera-scene'),viewer=$('viewer'),photo=$('photo'),turn=$('photo-turn'),actions=$('photo-actions');
 const STORAGE_KEY='six-years-demo-v1';
 const state={mode:'idle',count:0,active:-1,flipped:false,origin:'line',sound:false};
-let focusReturn=camera,audio,motor,flight=null,flightBody=null,flightScale=null,flightPose=null,baseWidth=270,projectionDistance=1100;
+let focusReturn=camera,audio,motor,flight=null,flightBody=null,flightScale=null,flightPose=null,baseWidth=270,projectionDistance=1100,printSpeed=.7;
+let framing={x:0,y:0,scale:1};
+try{const speed=Number(localStorage.getItem('six-years-print-speed'));if(speed>=.4&&speed<=1.4)printSpeed=speed;}catch{}
 const pad=n=>String(n).padStart(2,'0');
 try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));if(saved?.version===1&&Number.isInteger(saved.count)&&saved.count>=0&&saved.count<=total)state.count=saved.count;}catch{}
 const line=createMemoryLine({memories,onOpen:(index,source)=>{if(state.mode==='idle')openMemory(index,source,'line');}});
@@ -21,7 +24,7 @@ function controls(){
   $('shoot').innerHTML=state.count?'拍下一张 <span aria-hidden="true">↗</span>':'按下快门 <span aria-hidden="true">↗</span>';
 }
 function resetBody(body,value){body.interrupt();Feel.loop.remove(body);body.x=value;body.v=0;body.target=value;body.moved=false;body.onFrame?.(body);}
-function cameraStyles(b){return[[scene,{transform:`translate(-50%,-50%) translateY(${b.x*scene.clientWidth*.10}px) scale(${1+b.x*.16})`}]];}
+function cameraStyles(b){return[[scene,{transform:`translate(-50%,-50%) translate(${b.x*framing.x}px,${b.x*framing.y}px) scale(${1+b.x*(framing.scale-1)})`}]];}
 function shutterStyles(b){return[[$('camera-shell'),{transform:`translateY(${b.x*.3}px) rotate(${b.x*.035}deg)`}],[$('flash'),{opacity:String(Math.min(.65,Math.abs(b.v)/650))}]];}
 function feedStyles(b){return[[$('eject-paper'),{transform:`translateY(${101*(1-Math.max(0,Math.min(1,b.x)))}%)`}]];}
 function devStyles(b){const p=Math.max(0,Math.min(1,b.x));return[[$('developer'),{opacity:String(1-p)}]];}
@@ -30,10 +33,27 @@ const shutter=new Feel.Body({feel:'light',x:0,target:0,restX:.005,restV:.005,onF
 const fade=new Feel.Body({feel:'soft',x:0,target:0,restX:.001,restV:.001,onFrame:b=>{viewer.style.background=`rgba(255,255,255,${Math.max(0,b.x)*.92})`;}});
 const flip=new Feel.Body({feel:'smooth',x:0,target:0,restX:.02,restV:.02,onFrame:b=>{turn.style.transform=`rotateY(${b.x}deg)`;}});
 const developer=new Feel.Body({mass:1,freq:.42,zeta:1,x:0,target:0,restX:.008,restV:.015,onFrame:b=>Feel.paint(devStyles(b)),onSettle:()=>{if(state.mode==='developing')hangPhoto();}});
-const feed=new Feel.Body({mass:1,freq:.48,zeta:1,x:0,target:0,restX:.008,restV:.015,onFrame:b=>Feel.paint(feedStyles(b)),onSettle:()=>{if(state.mode==='printing')liftPhoto();}});
+const feed=new Feel.Body({mass:1,freq:.48*printSpeed,zeta:1,x:0,target:0,restX:.008,restV:.015*printSpeed,onFrame:b=>Feel.paint(feedStyles(b)),onSettle:()=>{if(state.mode==='printing')liftPhoto();}});
 Feel.handoff(zoom,cameraStyles);Feel.handoff(shutter,shutterStyles);Feel.handoff(feed,feedStyles);Feel.handoff(developer,devStyles);
 Feel.handoff(fade,b=>[[viewer,{background:`rgba(255,255,255,${Math.max(0,b.x)*.92})`}]]);Feel.handoff(flip,b=>[[turn,{transform:`rotateY(${b.x}deg)`}]]);
-function calibrate(){const r=KeepsakeGeometry.slotLayout(scene.clientWidth);const el=$('eject-window');Object.assign(el.style,{left:`${r.x}px`,top:`${r.y}px`,width:`${r.width}px`,height:`${r.height}px`});line.resize();}
+function calibrate(){
+  const size=scene.clientWidth,r=KeepsakeGeometry.slotLayout(size),el=$('eject-window');
+  Object.assign(el.style,{left:`${r.x}px`,top:`${r.y}px`,width:`${r.width}px`,height:`${r.height}px`});
+  const bay=scene.parentElement.getBoundingClientRect();
+  const paperWidth=Math.min(innerWidth*.52,(innerHeight*.66-46)*54/86),scale=Math.max(1,paperWidth/r.width);
+  const mouthY=innerHeight*.66;
+  framing={x:innerWidth/2-(bay.x+bay.width/2)-(r.centerX-size/2)*scale,y:mouthY+(size/2-r.mouthY)*scale-(bay.y+bay.height/2),scale};
+  line.resize();
+}
+function updatePrintSpeed(){
+  const speed=Number($('print-speed').value);if(!Number.isFinite(speed)||speed<.4||speed>1.4)return;
+  const previous=printSpeed,printing=state.mode==='printing';if(printing){feed.interrupt();Feel.loop.remove(feed);}
+  printSpeed=speed;const omega=2*Math.PI*.48*speed;feed.stiffness=omega*omega;feed.damping=2*omega;feed.restV=.015*speed;feed.v*=speed/previous;
+  $('speed-value').textContent=speed.toFixed(2)+'×';$('print-speed').setAttribute('aria-valuetext',speed.toFixed(2)+' 倍');
+  try{localStorage.setItem('six-years-print-speed',String(speed));}catch{}
+  if(printing)feed.to(1);
+}
+$('print-speed').value=String(printSpeed);$('speed-value').textContent=printSpeed.toFixed(2)+'×';$('print-speed').setAttribute('aria-valuetext',printSpeed.toFixed(2)+' 倍');$('print-speed').addEventListener('input',updatePrintSpeed);
 function photoSize(){const height=Math.max(170,innerHeight-230);const w=Math.min(285,innerWidth-90,height*54/86);return{w,h:w*86/54};}
 function centerRect(){const s=photoSize();return{x:(innerWidth-s.w)/2,y:Math.max(48,(innerHeight-s.h)/2-35),w:s.w};}
 function stopFlight(){for(const body of [flightBody,flightScale,flightPose]){if(body){body.onSettle=null;body.interrupt();Feel.loop.remove(body);}}flightBody=flightScale=flightPose=null;}
@@ -119,7 +139,7 @@ document.addEventListener('keydown',e=>{
   const modal=!viewer.hidden?viewer:!$('album').hidden?$('album'):null;
   if(modal&&e.key==='Tab'){const buttons=[...modal.querySelectorAll('button:not(:disabled)')].filter(el=>el.getClientRects().length&&!el.closest('[hidden]'));if(!buttons.length){e.preventDefault();modal.focus();return;}const first=buttons[0],last=buttons.at(-1);if(e.shiftKey&&(document.activeElement===first||!modal.contains(document.activeElement))){e.preventDefault();last.focus();}else if(!e.shiftKey&&(document.activeElement===last||!modal.contains(document.activeElement))){e.preventDefault();first.focus();}}
 });
-window.addEventListener('resize',()=>{calibrate();if(state.mode==='viewing'){const r=centerRect();stopFlight();photo.style.width=`${r.w}px`;photo.style.height=`${r.w*86/54}px`;photo.style.transform=flightTransform(r.x,r.y,1,0);}else if(state.mode==='idle')Feel.paint(cameraStyles(zoom));});
+window.addEventListener('resize',()=>{calibrate();if(state.mode==='viewing'){const r=centerRect();stopFlight();photo.style.width=`${r.w}px`;photo.style.height=`${r.w*86/54}px`;photo.style.transform=flightTransform(r.x,r.y,1,0);}else{const target=zoom.target;zoom.interrupt();Feel.loop.remove(zoom);Feel.paint(cameraStyles(zoom));if(Math.abs(zoom.x-target)>.001)zoom.to(target);}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopMotor();});
 $('camera-image').addEventListener('error',()=>say('相机图片加载失败，请刷新重试。'));
 document.querySelector('.demo-label').textContent=`${total} 张演示相纸，等着换成我们的照片。`;
