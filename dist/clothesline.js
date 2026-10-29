@@ -14,7 +14,7 @@
       const memory=memories[index],wrapper=document.createElement('div');wrapper.className='hanging-item';wrapper.id=`hanging-${index}`;
       const clip=document.createElement('span');clip.className='wood-clip';clip.setAttribute('aria-hidden','true');clip.append(document.createElement('i'));
       const card=document.createElement('button');card.className='hanging-card';card.setAttribute('data-memory-index',String(index));card.setAttribute('aria-label',`查看第 ${index+1} 张，${memory.title}`);
-      const image=new Image();image.src=memory.image;image.alt=memory.alt;image.draggable=false;
+      const image=new Image();image.className='hanging-image';image.dataset.photo=String(index+1);image.src=memory.image;image.alt=memory.alt;image.draggable=false;
       const caption=document.createElement('span');caption.className='hanging-caption';caption.textContent=memory.title;
       card.append(image,caption);wrapper.append(clip,card);host.append(wrapper);
       const item={index,wrapper,card,tilt:[-1.8,1.4,-.7,1.9,-1.2,.6][index%6],body:null};

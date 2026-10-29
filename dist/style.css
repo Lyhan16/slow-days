@@ -25,6 +25,13 @@ body:has(.viewer:not([hidden])){overflow:hidden}#experience[data-state="printing
 @media(prefers-reduced-motion:reduce){.flash{display:none}.photo,.photo-turn,.camera-scene,.hanging-item{will-change:auto}}
 
 .line-empty{color:#756b5f}.image-well img{filter:saturate(.9)}
+
+/* Keep every print and its image window the same shape, regardless of source dimensions. */
+.hanging-card,.album-card{min-width:0;overflow:hidden}
+.hanging-card .hanging-image,.album-card img{display:block;flex:none;width:100%;height:auto;aspect-ratio:46/62;min-width:0;min-height:0;object-fit:cover}
+.hanging-card .hanging-image[data-photo="2"],.hanging-card .hanging-image[data-photo="3"],.album-card img[data-photo="2"],.album-card img[data-photo="3"],.image-well img[data-photo="2"],.image-well img[data-photo="3"]{object-fit:contain;background:#eeeae4}
+.hanging-card .hanging-image[data-photo="4"],.album-card img[data-photo="4"],.image-well img[data-photo="4"]{object-position:right center}
+.hanging-card .hanging-image[data-photo="20"],.album-card img[data-photo="20"],.image-well img[data-photo="20"]{object-position:center bottom}
 @media(max-width:767px){#experience[data-state="printing"] .intro{opacity:0}}
 .eject-window{perspective-origin:50% 100%}
 /* The header is intentionally empty. New paper owns the foreground while printing. */

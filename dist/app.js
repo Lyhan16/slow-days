@@ -79,7 +79,7 @@ function fly(from,to,done){
 function preparePhoto(index){
   const m=memories[index];state.active=index;state.flipped=false;resetBody(angle,0);resetBody(flip,0);resetBody(developer,0);
   $('photo-title').textContent=m.title;$('photo-number').textContent=pad(index+1);$('back-number').textContent=`${index+1} / ${total}`;$('back-title').textContent=m.title;$('back-text').textContent=m.text;
-  $('photo-image').src=m.image;$('photo-image').alt=m.alt;photo.setAttribute('aria-pressed','false');photo.setAttribute('aria-label',`第 ${index+1} 张，${m.title}，翻到背面`);
+  $('photo-image').src=m.image;$('photo-image').alt=m.alt;$('photo-image').dataset.photo=String(index+1);photo.setAttribute('aria-pressed','false');photo.setAttribute('aria-label',`第 ${index+1} 张，${m.title}，翻到背面`);
   photo.querySelector('.photo-front').setAttribute('aria-hidden','false');photo.querySelector('.photo-back').setAttribute('aria-hidden','true');$('flip').textContent='翻到背面';$('flip-hint').textContent='点一下照片，看看背面。';
 }
 function backgroundInert(on){for(const id of ['workbench','heading','clothesline','footer','album'])$(id).inert=on;}
@@ -123,7 +123,7 @@ function openAlbum(){
   if(state.mode!=='idle'||!state.count)return;focusReturn=document.activeElement;mode('album');$('album-grid').replaceChildren();
   memories.slice(0,state.count).forEach((m,i)=>{
     const b=document.createElement('button');b.className='album-card';b.style.setProperty('--angle',`${[-2,1.5,1,-1.5][i%4]}deg`);b.setAttribute('aria-label',`查看第 ${i+1} 张，${m.title}`);
-    const img=new Image();img.src=m.image;img.alt=m.alt;img.loading='lazy';const caption=document.createElement('span');caption.className='album-caption';const label=document.createElement('span');label.textContent=m.title;const n=document.createElement('small');n.textContent=pad(i+1);caption.append(label,n);b.append(img,caption);b.addEventListener('click',()=>openMemory(i,b,'album'));$('album-grid').append(b);
+    const img=new Image();img.src=m.image;img.alt=m.alt;img.dataset.photo=String(i+1);img.loading='lazy';const caption=document.createElement('span');caption.className='album-caption';const label=document.createElement('span');label.textContent=m.title;const n=document.createElement('small');n.textContent=pad(i+1);caption.append(label,n);b.append(img,caption);b.addEventListener('click',()=>openMemory(i,b,'album'));$('album-grid').append(b);
   });
   $('album-summary').textContent=`${state.count} 张已经显影，共 ${total} 张。`;$('album').hidden=false;$('workbench').inert=true;$('clothesline').inert=true;$('heading').inert=true;$('footer').inert=true;$('close-album').focus({preventScroll:true});
 }
