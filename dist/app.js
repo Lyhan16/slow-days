@@ -7,7 +7,7 @@
 'use strict';
 const $=id=>document.getElementById(id),memories=window.MEMORIES,total=memories.length;
 const root=$('experience'),camera=$('camera'),scene=$('camera-scene'),viewer=$('viewer'),photo=$('photo'),turn=$('photo-turn'),actions=$('photo-actions');
-const STORAGE_KEY='six-years-demo-v1';
+const STORAGE_KEY='six-years-personal-v1';
 const state={mode:'idle',count:0,active:-1,flipped:false,origin:'line',sound:false};
 let focusReturn=camera,audio,motor,flight=null,flightBody=null,flightScale=null,flightPose=null,baseWidth=270,projectionDistance=1100,printSpeed=.7;
 let framing={x:0,y:0,scale:1};
@@ -31,11 +31,14 @@ function devStyles(b){const p=Math.max(0,Math.min(1,b.x));return[[$('developer')
 const zoom=new Feel.Body({feel:'gentle',x:0,target:0,restX:.001,restV:.001,onFrame:b=>Feel.paint(cameraStyles(b))});
 const shutter=new Feel.Body({feel:'light',x:0,target:0,restX:.005,restV:.005,onFrame:b=>Feel.paint(shutterStyles(b))});
 const fade=new Feel.Body({feel:'soft',x:0,target:0,restX:.001,restV:.001,onFrame:b=>{viewer.style.background=`rgba(255,255,255,${Math.max(0,b.x)*.92})`;}});
-const flip=new Feel.Body({feel:'smooth',x:0,target:0,restX:.02,restV:.02,onFrame:b=>{turn.style.transform=`rotateY(${b.x}deg)`;}});
+// A softly damped angular spring turns the entire print back to landscape.
+const paintTurn=()=>{turn.style.transform=`rotateZ(${angle.x}deg) rotateY(${flip.x}deg)`;};
+const flip=new Feel.Body({feel:'smooth',x:0,target:0,restX:.02,restV:.02,onFrame:paintTurn});
+const angle=new Feel.Body({mass:1,freq:1.1,zeta:.85,x:0,target:0,restX:.02,restV:.02,onFrame:paintTurn});
 const developer=new Feel.Body({mass:1,freq:.42,zeta:1,x:0,target:0,restX:.008,restV:.015,onFrame:b=>Feel.paint(devStyles(b)),onSettle:()=>{if(state.mode==='developing')hangPhoto();}});
 const feed=new Feel.Body({mass:1,freq:.48*printSpeed,zeta:1,x:0,target:0,restX:.008,restV:.015*printSpeed,onFrame:b=>Feel.paint(feedStyles(b)),onSettle:()=>{if(state.mode==='printing')liftPhoto();}});
 Feel.handoff(zoom,cameraStyles);Feel.handoff(shutter,shutterStyles);Feel.handoff(feed,feedStyles);Feel.handoff(developer,devStyles);
-Feel.handoff(fade,b=>[[viewer,{background:`rgba(255,255,255,${Math.max(0,b.x)*.92})`}]]);Feel.handoff(flip,b=>[[turn,{transform:`rotateY(${b.x}deg)`}]]);
+Feel.handoff(fade,b=>[[viewer,{background:`rgba(255,255,255,${Math.max(0,b.x)*.92})`}]]);
 function calibrate(){
   const size=scene.clientWidth,r=KeepsakeGeometry.slotLayout(size),el=$('eject-window');
   Object.assign(el.style,{left:`${r.x}px`,top:`${r.y}px`,width:`${r.width}px`,height:`${r.height}px`});
@@ -54,7 +57,7 @@ function updatePrintSpeed(){
   if(printing)feed.to(1);
 }
 $('print-speed').value=String(printSpeed);$('speed-value').textContent=printSpeed.toFixed(2)+'×';$('print-speed').setAttribute('aria-valuetext',printSpeed.toFixed(2)+' 倍');$('print-speed').addEventListener('input',updatePrintSpeed);
-function photoSize(){const height=Math.max(170,innerHeight-230);const w=Math.min(285,innerWidth-90,height*54/86);return{w,h:w*86/54};}
+function photoSize(){const height=Math.max(170,innerHeight-230);const landscape=state.mode==='viewing'&&memories[state.active]?.landscape;const w=Math.min(285,innerWidth-90,height*54/86,landscape?(innerWidth-36)*54/86:Infinity);return{w,h:w*86/54};}
 function centerRect(){const s=photoSize();return{x:(innerWidth-s.w)/2,y:Math.max(48,(innerHeight-s.h)/2-35),w:s.w};}
 function stopFlight(){for(const body of [flightBody,flightScale,flightPose]){if(body){body.onSettle=null;body.interrupt();Feel.loop.remove(body);}}flightBody=flightScale=flightPose=null;}
 function flightTransform(x,y,s,p){const cx=baseWidth/2,cy=baseWidth*86/54;return`translate3d(${x}px,${y}px,0) scale(${s}) translate(${cx}px,${cy}px) perspective(${projectionDistance}px) rotateZ(${-p*.35}deg) rotateX(${p*9}deg) translate(${-cx}px,${-cy}px)`;}
@@ -74,7 +77,7 @@ function fly(from,to,done){
   progress.onFrame=b=>{Feel.paint(transformAt(b));};progress.onSettle=()=>done?.();Feel.handoff(progress,transformAt);paint();progress.to(1);
 }
 function preparePhoto(index){
-  const m=memories[index];state.active=index;state.flipped=false;resetBody(flip,0);resetBody(developer,0);
+  const m=memories[index];state.active=index;state.flipped=false;resetBody(angle,0);resetBody(flip,0);resetBody(developer,0);
   $('photo-title').textContent=m.title;$('photo-number').textContent=pad(index+1);$('back-number').textContent=`${index+1} / ${total}`;$('back-title').textContent=m.title;$('back-text').textContent=m.text;
   $('photo-image').src=m.image;$('photo-image').alt=m.alt;photo.setAttribute('aria-pressed','false');photo.setAttribute('aria-label',`第 ${index+1} 张，${m.title}，翻到背面`);
   photo.querySelector('.photo-front').setAttribute('aria-hidden','false');photo.querySelector('.photo-back').setAttribute('aria-hidden','true');$('flip').textContent='翻到背面';$('flip-hint').textContent='点一下照片，看看背面。';
@@ -103,16 +106,16 @@ function hangPhoto(){
 function showActions(){actions.hidden=false;$('collect').textContent=state.origin==='album'?'放回相册':'挂回晾绳';$('previous').hidden=state.active===0;$('next').hidden=state.active>=state.count-1;}
 function openMemory(index,source,origin=state.origin){
   stopFlight();focusReturn=source||focusReturn;state.origin=origin;preparePhoto(index);resetBody(developer,1);resetBody(fade,1);viewer.hidden=false;photo.disabled=false;mode('viewing');showActions();
-  const r=centerRect();baseWidth=r.w;photo.style.width=`${r.w}px`;photo.style.height=`${r.w*86/54}px`;photo.style.transform=flightTransform(r.x,r.y,1,0);backgroundInert(true);photo.focus({preventScroll:true});
+  const r=centerRect();baseWidth=r.w;photo.style.width=`${r.w}px`;photo.style.height=`${r.w*86/54}px`;photo.style.transform=flightTransform(r.x,r.y,1,0);backgroundInert(true);if(memories[index].landscape)angle.to(-90);photo.focus({preventScroll:true});
 }
 function flipPhoto(){
-  if(state.mode!=='viewing')return;state.flipped=!state.flipped;flip.to(state.flipped?180:0);photo.setAttribute('aria-pressed',String(state.flipped));photo.setAttribute('aria-label',state.flipped?'翻回照片正面':'翻到照片背面');
+  if(state.mode!=='viewing')return;state.flipped=!state.flipped;flip.to(state.flipped?180:0);angle.to(state.flipped?0:(memories[state.active].landscape?-90:0));photo.setAttribute('aria-pressed',String(state.flipped));photo.setAttribute('aria-label',state.flipped?'翻回照片正面':'翻到照片背面');
   photo.querySelector('.photo-front').setAttribute('aria-hidden',String(state.flipped));photo.querySelector('.photo-back').setAttribute('aria-hidden',String(!state.flipped));$('flip').textContent=state.flipped?'翻回正面':'翻到背面';$('flip-hint').textContent=state.flipped?'有些话，写在照片背面。':'点一下照片，看看背面。';
 }
 function closeViewer(){
   if(state.mode!=='viewing')return;actions.hidden=true;backgroundInert(false);
   if(state.origin==='album'){viewer.hidden=true;resetBody(fade,0);mode('album');$('album').inert=false;(focusReturn?.isConnected?focusReturn:$('close-album')).focus({preventScroll:true});return;}
-  mode('returning');photo.disabled=true;flip.to(0);line.reveal(state.active);line.pending(state.active,true);const to=line.rect(state.active),from=photo.getBoundingClientRect();fade.to(0);
+  mode('returning');photo.disabled=true;resetBody(angle,0);flip.to(0);line.reveal(state.active);line.pending(state.active,true);const to=line.rect(state.active),from=photo.getBoundingClientRect();fade.to(0);
   fly({x:from.x,y:from.y,w:from.width},{x:to.x,y:to.y,w:to.width},()=>{line.pending(state.active,false);viewer.hidden=true;resetBody(fade,0);mode('idle');controls();line.card(state.active)?.focus({preventScroll:true});});
 }
 function navigate(delta){if(state.mode!=='viewing')return;const index=state.active+delta;if(index>=0&&index<state.count)openMemory(index);}
@@ -142,6 +145,6 @@ document.addEventListener('keydown',e=>{
 window.addEventListener('resize',()=>{calibrate();if(state.mode==='viewing'){const r=centerRect();stopFlight();photo.style.width=`${r.w}px`;photo.style.height=`${r.w*86/54}px`;photo.style.transform=flightTransform(r.x,r.y,1,0);}else{const target=zoom.target;zoom.interrupt();Feel.loop.remove(zoom);Feel.paint(cameraStyles(zoom));if(Math.abs(zoom.x-target)>.001)zoom.to(target);}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopMotor();});
 $('camera-image').addEventListener('error',()=>say('相机图片加载失败，请刷新重试。'));
-document.querySelector('.demo-label').textContent=`${total} 张演示相纸，等着换成我们的照片。`;
+document.querySelector('.demo-label').textContent=`${total} 张相纸，一起慢慢看。`;
 line.sync(state.count);if(state.count)line.reveal(state.count-1);calibrate();mode('idle');controls();Feel.paint(cameraStyles(zoom));
 })();

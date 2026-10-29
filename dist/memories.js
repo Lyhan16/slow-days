@@ -1,27 +1,170 @@
-/* The array order is the shooting order. All 21 entries are illustrative.
-   To replace: change image, title and text; keep the stable id. No real dates
-   or relationship events have been invented. Display 20 by removing one entry.
-   Change STORAGE_KEY in app.js when replacing the demonstration with real photos. */
 window.MEMORIES = [
-  ['山间的风','这里可以写下，那天我们为什么出发。\n\n不必是特别大的事，记得就很好。'],
-  ['沿途的颜色','这里留给一次出门时的回忆。\n\n也许是风声，也许是没说完的话。'],
-  ['去远一点的地方','这里可以记下一次出门。\n\n去了哪里，发生了什么，你最想留下哪一个瞬间。'],
-  ['偶然遇见','这里留给旅途中，一个偶然遇见的小小瞬间。'],
-  ['在路上','这里可以写下，一起走过的一段路。\n\n照片没有拍到的部分，也可以记在背面。'],
-  ['沿着光走','这里留给一束光，和当时的心情。'],
-  ['山外还有山','这里可以写下，当时看见的风景。\n\n还有，站在你身边的人。'],
-  ['慢一点也很好','这里留给一个没有赶时间的日子。'],
-  ['一起看风景','这里可以记下，你眼里的那个瞬间。'],
-  ['天色刚刚好','这里留给那天的天气。\n\n也留给那天，没有被照片记录下来的声音。'],
-  ['普通的一天','这里可以是一顿饭、一场散步，或者什么也没做的一天。'],
-  ['把时间放慢','这里留给一段想多停一会儿的时间。'],
-  ['云停了一会儿','这里可以写下，抬头看见天空时想到的话。'],
-  ['风吹过的时候','这里留给一个很小，却一直记得的细节。'],
-  ['不赶路的下午','这里可以记下一次，临时改变的计划。'],
-  ['一些小小的发现','这里留给一个只属于你们的小发现。'],
-  ['远方来信','这里可以写下，隔着距离也想说的话。'],
-  ['日子里的颜色','这里留给一段有颜色的回忆。\n\n也许是某个季节，也许是某一天。'],
-  ['留一张给今天','这里可以记下，今天想留下的瞬间。'],
-  ['还想再看一眼','这里留给那张，每次翻到都会停一下的照片。'],
-  ['下一张，留给以后','这里留给你想在六周年说的话。\n\n以及，下一盒相纸想和她一起拍下的日子。']
-].map(([title,text],index)=>({id:`demo-${index+1}`,title,text,image:`assets/memory-${String(index+1).padStart(2,'0')}.jpg`,alt:`第 ${index+1} 张演示风景照片`,demo:true}));
+  {
+    "id": "personal-1",
+    "title": "回忆",
+    "text": "咱们的第一张合照，当然要放上来啦！ps：虽然咱们都拍得不好看哈哈哈",
+    "image": "assets/personal/01.jpg",
+    "alt": "第 1 张照片",
+    "landscape": true
+  },
+  {
+    "id": "personal-2",
+    "title": "回忆",
+    "text": "记下你在北方的第一次看雪",
+    "image": "assets/personal/02.jpg",
+    "alt": "第 2 张照片",
+    "landscape": true
+  },
+  {
+    "id": "personal-3",
+    "title": "回忆",
+    "text": "这张好像是去大同之前拍的，还记得当时兴奋地一起做计划",
+    "image": "assets/personal/03.jpg",
+    "alt": "第 3 张照片",
+    "landscape": false
+  },
+  {
+    "id": "personal-4",
+    "title": "回忆",
+    "text": "两周年的视频，不知道你还记不记得咱们疫情时候的样子哈哈哈",
+    "image": "assets/personal/04.jpg",
+    "alt": "第 4 张照片",
+    "landscape": false
+  },
+  {
+    "id": "personal-5",
+    "title": "回忆",
+    "text": "那个时候随便找个镜面都能随地大小拍",
+    "image": "assets/personal/05.jpg",
+    "alt": "第 5 张照片",
+    "landscape": true
+  },
+  {
+    "id": "personal-6",
+    "title": "回忆",
+    "text": "不知道你还有没有印象，咱们大半夜起来当志愿者，你的脑袋还一直在往下垂",
+    "image": "assets/personal/06.jpg",
+    "alt": "第 6 张照片",
+    "landscape": false
+  },
+  {
+    "id": "personal-7",
+    "title": "回忆",
+    "text": "你很喜欢的一张我的照片，那就放在这里吧！",
+    "image": "assets/personal/07.jpg",
+    "alt": "第 7 张照片",
+    "landscape": true
+  },
+  {
+    "id": "personal-8",
+    "title": "回忆",
+    "text": "感觉你还挺适合戴发卡的，可以多尝试一下嘛",
+    "image": "assets/personal/08.jpg",
+    "alt": "第 8 张照片",
+    "landscape": true
+  },
+  {
+    "id": "personal-9",
+    "title": "回忆",
+    "text": "咦，发现了你想要养鱼的端倪，原来这个时候就喜欢上了呀哈哈哈",
+    "image": "assets/personal/09.jpg",
+    "alt": "第 9 张照片",
+    "landscape": false
+  },
+  {
+    "id": "personal-10",
+    "title": "回忆",
+    "text": "你下班的时候居然一直没发现我，所以就有了这张偷拍照片",
+    "image": "assets/personal/10.jpg",
+    "alt": "第 10 张照片",
+    "landscape": false
+  },
+  {
+    "id": "personal-11",
+    "title": "回忆",
+    "text": "啦啦啦～记得你那个时候特别喜欢 ipad 画画",
+    "image": "assets/personal/11.jpg",
+    "alt": "第 11 张照片",
+    "landscape": true
+  },
+  {
+    "id": "personal-12",
+    "title": "回忆",
+    "text": "在大理的时候，我还真的没想到你晚上会过来跟我一起睡诶",
+    "image": "assets/personal/12.jpg",
+    "alt": "第 12 张照片",
+    "landscape": false
+  },
+  {
+    "id": "personal-13",
+    "title": "回忆",
+    "text": "希望咱们之后也能像这样一起合作做作业",
+    "image": "assets/personal/13.jpg",
+    "alt": "第 13 张照片",
+    "landscape": false
+  },
+  {
+    "id": "personal-14",
+    "title": "回忆",
+    "text": "开往春天的巴士，我喜欢春天和秋天，以及有你的每个季节",
+    "image": "assets/personal/14.jpg",
+    "alt": "第 14 张照片",
+    "landscape": true
+  },
+  {
+    "id": "personal-15",
+    "title": "回忆",
+    "text": "备考时候过的六一儿童节，偶尔抽出时间去做一些有仪式感的事情，还真的挺有趣诶",
+    "image": "assets/personal/15.jpg",
+    "alt": "第 15 张照片",
+    "landscape": true
+  },
+  {
+    "id": "personal-16",
+    "title": "回忆",
+    "text": "哈哈哈哈，有一种淡淡的幸福感",
+    "image": "assets/personal/16.jpg",
+    "alt": "第 16 张照片",
+    "landscape": false
+  },
+  {
+    "id": "personal-17",
+    "title": "回忆",
+    "text": "毕业啦！以后人生的每个阶段，也都想和你一起走过",
+    "image": "assets/personal/17.jpg",
+    "alt": "第 17 张照片",
+    "landscape": false
+  },
+  {
+    "id": "personal-18",
+    "title": "回忆",
+    "text": "就这样晚上在江边随意走走，看看夜景吹吹风，也很惬意了",
+    "image": "assets/personal/18.jpg",
+    "alt": "第 18 张照片",
+    "landscape": false
+  },
+  {
+    "id": "personal-19",
+    "title": "回忆",
+    "text": "希望你有机会能再来成都玩一次，一起去逛逛你还没去过的地方",
+    "image": "assets/personal/19.jpg",
+    "alt": "第 19 张照片",
+    "landscape": false
+  },
+  {
+    "id": "personal-20",
+    "title": "回忆",
+    "text": "自己出去玩的时候，总会想，要是你也在就好了",
+    "image": "assets/personal/20.jpg",
+    "alt": "第 20 张照片",
+    "landscape": false
+  },
+  {
+    "id": "personal-21",
+    "title": "回忆",
+    "text": "拍立得没有拍好，那就用最后这一张来收尾吧！和小鱼一起的合照",
+    "image": "assets/personal/21.jpg",
+    "alt": "第 21 张照片",
+    "landscape": true
+  }
+];
