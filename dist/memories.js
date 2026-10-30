@@ -10,7 +10,7 @@ window.MEMORIES = [
   {
     "id": "personal-2",
     "title": "回忆",
-    "text": "记下你在北方的第一次看雪",
+    "text": "记下你在北方的第一次看雪，你踩在雪地里咯吱咯吱地响",
     "image": "assets/personal/02.jpg",
     "alt": "第 2 张照片",
     "landscape": true
@@ -18,10 +18,10 @@ window.MEMORIES = [
   {
     "id": "personal-3",
     "title": "回忆",
-    "text": "这张好像是去大同之前拍的，还记得当时兴奋地一起做计划",
+    "text": "这张好像是去大同之前拍的，还记得当时在兴奋地一起做计划",
     "image": "assets/personal/03.jpg",
     "alt": "第 3 张照片",
-    "landscape": false
+    "landscape": true
   },
   {
     "id": "personal-4",
@@ -42,7 +42,7 @@ window.MEMORIES = [
   {
     "id": "personal-6",
     "title": "回忆",
-    "text": "不知道你还有没有印象，咱们大半夜起来当志愿者，你的脑袋还一直在往下垂",
+    "text": "还记得那天半夜爬起来当志愿者吗，你困得脑袋一点一点往下垂，就这样趴着也能睡着",
     "image": "assets/personal/06.jpg",
     "alt": "第 6 张照片",
     "landscape": false
@@ -58,7 +58,7 @@ window.MEMORIES = [
   {
     "id": "personal-8",
     "title": "回忆",
-    "text": "感觉你还挺适合戴发卡的，可以多尝试一下嘛",
+    "text": "说真的，你戴发卡挺好看的，以后可以多试试嘛",
     "image": "assets/personal/08.jpg",
     "alt": "第 8 张照片",
     "landscape": true
@@ -74,7 +74,7 @@ window.MEMORIES = [
   {
     "id": "personal-10",
     "title": "回忆",
-    "text": "你下班的时候居然一直没发现我，所以就有了这张偷拍照片",
+    "text": "你那天下班，径直走过都没发现我，于是就有了这张偷拍",
     "image": "assets/personal/10.jpg",
     "alt": "第 10 张照片",
     "landscape": false
@@ -90,7 +90,7 @@ window.MEMORIES = [
   {
     "id": "personal-12",
     "title": "回忆",
-    "text": "在大理的时候，我还真的没想到你晚上会过来跟我一起睡诶",
+    "text": "在雪山上爬了一半，你就开始高反了，后来的照片都是你坐着喘气的样子",
     "image": "assets/personal/12.jpg",
     "alt": "第 12 张照片",
     "landscape": false
@@ -98,7 +98,7 @@ window.MEMORIES = [
   {
     "id": "personal-13",
     "title": "回忆",
-    "text": "希望咱们之后也能像这样一起合作做作业",
+    "text": "以后也要像这样，一起并肩完成各种作业呀！",
     "image": "assets/personal/13.jpg",
     "alt": "第 13 张照片",
     "landscape": false
@@ -114,7 +114,7 @@ window.MEMORIES = [
   {
     "id": "personal-15",
     "title": "回忆",
-    "text": "备考时候过的六一儿童节，偶尔抽出时间去做一些有仪式感的事情，还真的挺有趣诶",
+    "text": "备考最忙的时候，也要过个六一，偶尔抽出时间去做一些有仪式感的事情，还真的挺有趣诶",
     "image": "assets/personal/15.jpg",
     "alt": "第 15 张照片",
     "landscape": true
@@ -146,7 +146,7 @@ window.MEMORIES = [
   {
     "id": "personal-19",
     "title": "回忆",
-    "text": "希望你有机会能再来成都玩一次，一起去逛逛你还没去过的地方",
+    "text": "希望你有机会能再来成都，一起走走你还没去过的地方",
     "image": "assets/personal/19.jpg",
     "alt": "第 19 张照片",
     "landscape": false
@@ -154,7 +154,7 @@ window.MEMORIES = [
   {
     "id": "personal-20",
     "title": "回忆",
-    "text": "自己出去玩的时候，总会想，要是你也在就好了",
+    "text": "每次一个人出去玩，看到好看的风景，总是想，要是你在就好了",
     "image": "assets/personal/20.jpg",
     "alt": "第 20 张照片",
     "landscape": false

@@ -8,18 +8,28 @@
   global.createMemoryLine=function({memories,onOpen}){
     const $=id=>document.getElementById(id);
     const viewport=$('line-viewport'),track=$('line-track'),host=$('hanging-photos');
-    const items=[];let width=0,cardWidth=100,step=140,busy=false;
-    function styles(item,b){return [[item.wrapper,{transform:`rotateZ(${item.tilt+b.x}deg) rotateY(${b.x*.35}deg)`}]];}
+    const items=[];let width=0,cardWidth=100,step=140,busy=false,paging=false,windHeld=false,releaseDistance=0;
+    // A shared wind bends each print about its own peg. Negative angles move
+    // the bottom edge right; left paging therefore requests negative wind.
+    const wind=new Feel.Body({mass:1,freq:2.8,zeta:.82,x:0,target:0,restX:.03,restV:.1,onFrame:()=>{for(const item of items)Feel.paint(styles(item,item.body));}});
+    const page=new Feel.Body({mass:1,freq:1.8,zeta:1,x:0,target:0,min:0,max:0,restX:.5,restV:1.5,onFrame:b=>{viewport.scrollLeft=b.x;if(paging&&windHeld&&Math.abs(b.target-b.x)<=releaseDistance){windHeld=false;wind.to(0);}navigation();},onSettle:()=>{paging=false;windHeld=false;wind.to(0);}});
+    function styles(item,b){return [[item.wrapper,{transform:`rotateZ(${item.tilt+b.x+wind.x}deg) rotateY(${(b.x+wind.x)*.35}deg)`}]];}
+    function stopPage(){page.interrupt();Feel.loop.remove(page);page.x=viewport.scrollLeft;page.v=0;page.target=page.x;paging=false;windHeld=false;wind.to(0);}
+    function turnPage(direction){
+      if(busy)return;const max=Math.max(0,width-viewport.clientWidth),origin=paging?page.target:viewport.scrollLeft,target=Math.max(0,Math.min(max,origin+direction*step*3));if(Math.abs(target-origin)<1)return;
+      page.interrupt();page.x=viewport.scrollLeft;page.min=0;page.max=max;paging=true;windHeld=true;releaseDistance=Math.max(3,Math.abs(target-page.x)*.2);wind.to(direction*6);page.to(target);
+    }
     function make(index){
       const memory=memories[index],wrapper=document.createElement('div');wrapper.className='hanging-item';wrapper.id=`hanging-${index}`;
       const clip=document.createElement('span');clip.className='wood-clip';clip.setAttribute('aria-hidden','true');clip.append(document.createElement('i'));
       const card=document.createElement('button');card.className='hanging-card';card.setAttribute('data-memory-index',String(index));card.setAttribute('aria-label',`查看第 ${index+1} 张，${memory.title}`);
       const image=new Image();image.className='hanging-image';image.dataset.photo=String(index+1);image.src=memory.image;image.alt=memory.alt;image.draggable=false;
-      const caption=document.createElement('span');caption.className='hanging-caption';caption.textContent=memory.title;
+      const caption=document.createElement('span');caption.className='hanging-caption';caption.append(window.createPhotoDate(index));
       card.append(image,caption);wrapper.append(clip,card);host.append(wrapper);
       const item={index,wrapper,card,tilt:[-1.8,1.4,-.7,1.9,-1.2,.6][index%6],body:null};
       item.body=new Feel.Body({mass:.35,freq:1.35,zeta:.30,x:0,target:0,restX:.02,restV:.04,onFrame:b=>Feel.paint(styles(item,b))});
-      Feel.handoff(item.body,b=>styles(item,b));Feel.paint(styles(item,item.body));
+      // Render the sum of local swing and shared wind in one physical loop.
+      Feel.paint(styles(item,item.body));
       card.addEventListener('click',()=>{if(!busy)onOpen(index,card);});
       card.addEventListener('pointerenter',e=>{
         if(busy||Feel.reducedMotion)return;const rect=card.getBoundingClientRect();const sign=e.clientX<rect.x+rect.width/2?-1:1;item.body.kick(sign*13);
@@ -33,8 +43,8 @@
       return item;
     }
     function resize(){
-      const available=viewport.clientWidth||innerWidth,height=viewport.clientHeight||190;
-      cardWidth=Math.max(68,Math.min(innerWidth<768?85:116,(height-57)*54/86));step=cardWidth+(innerWidth<768?29:44);
+      const available=viewport.clientWidth||innerWidth,height=(viewport.clientHeight||260)-52;
+      cardWidth=Math.max(68,Math.min(innerWidth<768?108:136,(height-57)*54/86));step=cardWidth+(innerWidth<768?29:44);
       const padding=innerWidth<768?30:70;
       width=Math.max(available,items.length?items.length*step-(step-cardWidth)+padding*2:available);
       track.style.width=`${width}px`;
@@ -57,14 +67,16 @@
     }
     function reveal(index){
       const item=items[index];if(!item)return;const center=parseFloat(item.wrapper.style.left)+cardWidth/2;
+      stopPage();
       viewport.scrollLeft=Math.max(0,Math.min(width-viewport.clientWidth,center-viewport.clientWidth/2));navigation();
     }
     function rect(index){return items[index].card.getBoundingClientRect();}
     function pending(index,on){items[index].card.style.visibility=on?'hidden':'visible';}
     function swing(index,impulse=10){if(!Feel.reducedMotion)items[index]?.body.kick(impulse);}
-    function setBusy(on){busy=on;for(const item of items)item.card.disabled=on;viewport.inert=on;$('line-previous').disabled=on||viewport.scrollLeft<=2;$('line-next').disabled=on||viewport.scrollLeft+viewport.clientWidth>=width-2;}
-    $('line-previous').addEventListener('click',()=>{viewport.scrollLeft=Math.max(0,viewport.scrollLeft-step*3);navigation();});
-    $('line-next').addEventListener('click',()=>{viewport.scrollLeft=Math.min(width-viewport.clientWidth,viewport.scrollLeft+step*3);navigation();});
+    function setBusy(on){busy=on;if(on)stopPage();for(const item of items)item.card.disabled=on;viewport.inert=on;$('line-previous').disabled=on||viewport.scrollLeft<=2;$('line-next').disabled=on||viewport.scrollLeft+viewport.clientWidth>=width-2;}
+    $('line-previous').addEventListener('click',()=>turnPage(-1));
+    $('line-next').addEventListener('click',()=>turnPage(1));
+    viewport.addEventListener('pointerdown',stopPage,{passive:true});viewport.addEventListener('wheel',stopPage,{passive:true});
     viewport.addEventListener('scroll',navigation,{passive:true});
     return{sync,resize,reveal,rect,pending,swing,setBusy,card:index=>items[index]?.card,get count(){return items.length;}};
   };

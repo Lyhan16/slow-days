@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>出纸与显影衔接校验</title><link rel="stylesheet" href="assets/feel.css"><script src="assets/feel.js"></script><script src="assets/rig.js"></script>
+<style>body{margin:24px;background:#fff;font-family:sans-serif;color:#38363b}h1{font-size:22px;font-weight:400}p{line-height:1.8}.stage{position:relative;height:320px}.window{position:absolute;left:50%;top:28px;margin-left:-80px;width:160px;height:255px;overflow:hidden;border-bottom:3px solid #625d58}.paper{position:absolute;width:160px;height:255px;padding:12px 12px 0;display:flex;flex-direction:column;background:#fffefa;border:1px solid #e6e0d9}.full{left:50%;top:28px;margin-left:-80px}.well{position:relative;width:100%;aspect-ratio:46/62;overflow:hidden;flex:none}.well img{width:100%;height:100%;object-fit:cover}.cover{position:absolute;inset:0;background:#dfe1d7}</style></head>
+<body><h1>出纸时就开始显影</h1><p>两条临界阻尼弹簧同时启动，沿用 0.6 倍出纸速度。两幅预览共用同一显影进度。此页只用于动效校验。</p><div id="feed-rig"></div><div id="development-rig"></div>
+<script>
+const stageFeed=document.createElement('div'),stageDevelopment=document.createElement('div');stageFeed.className=stageDevelopment.className='stage';
+function paper(full=false){const p=document.createElement('div');p.className='paper'+(full?' full':'');const well=document.createElement('div');well.className='well';const image=new Image();image.src='assets/personal/01.jpg';image.alt='显影校验相片';const cover=document.createElement('span');cover.className='cover';well.append(image,cover);p.append(well);return{paper:p,cover};}
+const a=paper(),b=paper(true),windowEl=document.createElement('div');windowEl.className='window';windowEl.append(a.paper);stageFeed.append(windowEl);stageDevelopment.append(b.paper);
+const speed=.6,feedStyles=body=>[[a.paper,{transform:`translateY(${101*(1-Math.max(0,Math.min(1,body.x)))}%)`}]],devStyles=body=>[a.cover,b.cover].map(el=>[el,{opacity:String(1-Math.max(0,Math.min(1,body.x)))}]);
+// Unit mass normalizes both readouts; zeta 1 keeps paper/reveal monotonic.
+// .48/.42 Hz are the application's existing feed/development base rates,
+// both scaled by .6 so development tracks feed, slightly behind its motion.
+const feed=new Feel.Body({mass:1,freq:.48*speed,zeta:1,x:0,target:0,restX:.008,restV:.015*speed,onFrame:body=>Feel.paint(feedStyles(body))});
+const developer=new Feel.Body({mass:1,freq:.42*speed,zeta:1,x:0,target:0,restX:.008,restV:.015*speed,onFrame:body=>Feel.paint(devStyles(body))});
+const feedHandoff=Feel.handoff(feed,feedStyles),devHandoff=Feel.handoff(developer,devStyles);
+const reset=()=>{feed.jump(0);developer.jump(0);},play=()=>{reset();developer.to(1);feed.to(1);};
+const actions=[{key:'1',label:'同步重放',run:play},{key:'0',label:'复位',run:reset}];
+Feel.paint(feedStyles(feed));Feel.paint(devStyles(developer));
+Feel.rig(document.getElementById('feed-rig'),{body:feed,stage:stageFeed,travel:[0,1],stops:[0,1],feel:'gentle',title:'出纸进度',handoff:feedHandoff,actions});
+Feel.rig(document.getElementById('development-rig'),{body:developer,stage:stageDevelopment,travel:[0,1],stops:[0,1],feel:'gentle',title:'两处画面的共同显影进度',handoff:devHandoff,actions});
+</script></body></html>
